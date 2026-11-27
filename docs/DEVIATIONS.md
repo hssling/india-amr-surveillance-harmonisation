@@ -30,3 +30,36 @@ The pixel-based extraction reads bar heights from the rendered page but shares t
 positions and colours with the vector extraction; it is therefore a check on the reading of bar heights, not a fully
 independent extraction. Two pixel columns either side of each bar's centre are read, because most charts draw an error bar
 (undefined in the report) on each bar's centre line.
+
+## C. Clarifications made during AMRSN extraction (28 November 2026), before any human-animal comparison was computed
+
+C1. **AMRSN specimen category for E. coli.** No AMRSN table combines all specimens for E. coli. The rule in section
+4.1 (the specimen category with the most isolates) is applied among categories for which susceptibility is reported:
+"all specimens except urine and faeces" in every year (2019: the report has no urine susceptibility table for
+Enterobacterales; 2020-2022: non-urine isolates outnumber urine isolates in each report's specimen distribution
+table). Urine isolates are analysed as a secondary series.
+
+C2. **Report version.** Each year's value is taken from that year's own annual report. Later reports' trend tables
+revise earlier years; the revisions are extracted and reported as a check.
+
+C3. **Measure.** AMRSN reports percentage susceptible only. The human measure is non-susceptible (100 minus %S,
+i.e. resistant plus intermediate); INFAAR reports percentage resistant without stating how intermediate results were
+handled. The comparison is labelled accordingly.
+
+C4. **Ceftriaxone and co-trimoxazole (E. coli).** AMRSN reports these only for urine isolates: ceftriaxone in 2022
+only (Table 2.13, OPD, ward and ICU combined); co-trimoxazole in 2020-2022. Urine values for 2020 and 2021 are
+printed as images and were transcribed by eye from the "Overall" row (flagged as image-read; percentages are printed
+as whole numbers).
+
+C5. **Methicillin resistance in S. aureus.** AMRSN: cefoxitin non-susceptibility (phenotypic). INFAAR aquaculture:
+cefoxitin resistance (phenotypic, Figure 2). INFAAR livestock: MRSA confirmed by mecA or mecC detection, reported as a
+count of the S. aureus tested. Compared with the definition stated for each.
+
+C6. **Further pairs (section 4.3, "any further pair reported by both networks").** E. coli: ceftazidime
+(aquaculture), co-trimoxazole (urine series). S. aureus: penicillin, erythromycin, linezolid, tetracycline,
+co-trimoxazole, ciprofloxacin (aquaculture, same drug) and fluoroquinolones as a class (livestock enrofloxacin
+against human ciprofloxacin).
+
+C7. **INFAAR denominators.** Per-drug numbers tested are not reported. Wilson intervals for INFAAR use the number of
+isolates per source given in the figure legends or text (fisheries legends; livestock: cattle, buffalo, goat, poultry,
+S. aureus) and are labelled approximate; no interval is given where no count is reported (sheep, pigs).
