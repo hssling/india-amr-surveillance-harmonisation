@@ -1,6 +1,6 @@
 # Do India's human and animal antimicrobial resistance surveillance networks speak the same language?
 
-Code and derived outputs for a study by Siddalingaiah H S and Preethi Ashok Masali.
+Code and derived outputs for a study by Siddalingaiah H S.
 
 **Status:** in preparation. The analysis plan is released here before any outcome is analysed; that
 release carries a Zenodo DOI and serves as the pre-registration. Code and outputs follow in later releases.
