@@ -7,8 +7,10 @@ for which one network has no routine panel are excluded. Methicillin
 markers (cefoxitin, oxacillin) are kept as one "methicillin resistance" class for staphylococci.
 
 E. coli result is benchmarked against the EU harmonised monitoring panel for indicator commensal E. coli
-(Commission Implementing Decision (EU) 2020/1729, Annex, first panel). EU_ECOLI below was taken from the EUR-Lex
-consolidated text (01.01.2025) and must be checked against OJ L 387, 19.11.2020, p. 8 before publication.
+(Commission Implementing Decision (EU) 2020/1729, Annex, Table 2, OJ L 387, 19.11.2020, p. 15-16; verified against
+the Official Journal text, 28 Nov 2026). Staphylococcal panels are benchmarked against WHO (2017) Integrated
+surveillance of antimicrobial resistance in foodborne bacteria, Table 1.1 (p. 15), Staphylococcus row (first- and
+second-priority agents together: italics marking second priority are not recoverable from the PDF text).
 
 Usage:  python -I src/09_min_panel.py      writes outputs/min_panel.csv, outputs/min_panel_eu_benchmark.csv
 """
@@ -25,7 +27,7 @@ spec = importlib.util.spec_from_file_location("aud", os.path.join(HERE, "08_audi
 aud = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(aud)
 
-EU_ECOLI = {  # drug: class (EU 2020/1729 first panel, Salmonella and indicator commensal E. coli) - VERIFY against OJ
+EU_ECOLI = {  # drug: class (EU 2020/1729 Annex Table 2 first panel, Salmonella and indicator commensal E. coli)
     "amikacin": "aminoglycosides", "ampicillin": "penicillins", "azithromycin": "macrolides",
     "cefotaxime": "3rd-gen cephalosporins", "ceftazidime": "3rd-gen cephalosporins", "chloramphenicol": "phenicols",
     "ciprofloxacin": "fluoroquinolones", "colistin": "polymyxins", "gentamicin": "aminoglycosides",
@@ -33,6 +35,9 @@ EU_ECOLI = {  # drug: class (EU 2020/1729 first panel, Salmonella and indicator 
     "sulfamethoxazole": "folate-pathway inhibitors", "tetracycline": "tetracyclines", "tigecycline": "glycylcyclines",
     "trimethoprim": "folate-pathway inhibitors",
 }
+WHO_STAPH = {"gentamicin", "chloramphenicol", "cefoxitin", "vancomycin", "clindamycin", "erythromycin", "linezolid",
+             "penicillin", "oxacillin", "ciprofloxacin", "rifampicin", "quinupristin-dalfopristin", "sulfisoxazole",
+             "tetracycline", "trimethoprim"}  # WHO 2017 Table 1.1, Staphylococcus row
 STAPH = {"S. aureus", "CoNS"}
 METH = {"cefoxitin", "oxacillin"}
 
@@ -99,6 +104,22 @@ def main():
     b.to_csv(os.path.join(OUT, "min_panel_eu_benchmark.csv"), index=False)
     print("\nE. coli derived panel vs EU 2020/1729 first panel (by class):")
     print(b.to_string(index=False))
+
+    # staphylococci vs WHO 2017 Table 1.1 (drug level; co-trimoxazole counted for trimethoprim + sulfisoxazole)
+    who = WHO_STAPH | {"co-trimoxazole"}
+    wrows = []
+    for org in ("S. aureus", "CoNS"):
+        g = mp[mp.organism == org]
+        in_panel = set(g.representative) | {d for x in g.other_drugs_in_class for d in x.split(", ") if d}
+        for _, r in g.iterrows():
+            wrows.append({"organism": org, "class": r["class"], "drug": r.representative, "status":
+                          "derived and on WHO list" if r.representative in who else "derived, not on WHO list"})
+        for d in sorted(WHO_STAPH - in_panel - {"trimethoprim", "sulfisoxazole"}):
+            wrows.append({"organism": org, "class": "", "drug": d, "status": "on WHO list, tested by neither network"})
+    w = pd.DataFrame(wrows)
+    w.to_csv(os.path.join(OUT, "min_panel_who_staph_benchmark.csv"), index=False)
+    print("\nStaphylococci derived panel vs WHO 2017 Table 1.1:")
+    print(w.groupby(["organism", "status"]).drug.apply(lambda x: ", ".join(x)).to_string())
 
 
 if __name__ == "__main__":
