@@ -17,3 +17,6 @@ submission/
 __pycache__/
 .pytest_cache/
 .venv/
+
+# Results stay local until the release that accompanies submission.
+outputs/*.csv
