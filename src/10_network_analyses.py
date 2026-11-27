@@ -43,7 +43,11 @@ con = load("07_concordance")
 
 # ---------------------------------------------------------------- D2 measurement DAG
 RATING = {"Sampling frame": "not aligned", "Isolate selection / de-duplication": "not reported",
-          "AST method": "partly aligned", "Interpretive standard and edition": "not reported",
+          "AST method": "partly aligned",
+          # partly aligned on paper: ICMR human SOP 2019 (CLSI M100 29th ed) and ICMR-ICAR-FAO veterinary SOP 2019
+          # (CLSI 2018 adapted) give identical surveillance breakpoints for the shared E. coli drugs; INFAAR does
+          # not cite the SOP, so adherence is unverified
+          "Interpretive standard and edition": "partly aligned",
           "Intermediate category handling": "not aligned", "Antimicrobial panel": "partly aligned",
           "Reporting and aggregation": "not aligned", "Quality assurance": "partly aligned"}
 MEAS = list(RATING)
