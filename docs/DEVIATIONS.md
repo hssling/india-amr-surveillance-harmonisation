@@ -63,3 +63,11 @@ against human ciprofloxacin).
 C7. **INFAAR denominators.** Per-drug numbers tested are not reported. Wilson intervals for INFAAR use the number of
 isolates per source given in the figure legends or text (fisheries legends; livestock: cattle, buffalo, goat, poultry,
 S. aureus) and are labelled approximate; no interval is given where no count is reported (sheep, pigs).
+
+C8. **Further shared organisms (section 4.3), identified while auditing dimension 1 and before any comparison for
+them was computed.** Coagulase-negative staphylococci (AMRSN: CoNS column of the staphylococcal tables; INFAAR:
+Figure 3, fisheries, and Figure 10, livestock, where the panel assignment follows the report's text because the
+captions and text disagree; see the extraction validation), Aeromonas species (AMRSN: all-specimens column of the
+Aeromonas tables; INFAAR: Figure 7) and Vibrio species other than V. cholerae (AMRSN: "Vibrio spp." column,
+flagged for small numbers; INFAAR: Figure 6). V. cholerae (AMRSN) and V. parahaemolyticus (INFAAR) are different
+species and are not paired.

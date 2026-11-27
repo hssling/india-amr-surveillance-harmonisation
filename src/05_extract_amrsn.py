@@ -36,14 +36,22 @@ TABLES = [
     (2021, 106, "4.4", "S. aureus", "all specimens", "trend", None),
     (2022, 151, "6.4", "S. aureus", "all specimens", "trend", None),
     (2022, 62, "2.13", "E. coli", "urine", "groups", ["OPD", "Ward", "ICU"]),
+    # further shared organisms (DEVIATIONS C8): first (single-year) table on the page
+    (2019, 81, "5.2", "Aeromonas spp.", "all specimens", "groups", ["Aeromonas spp."], 0),
+    (2020, 130, "6.1", "Aeromonas spp.", "all specimens", "groups", ["Aeromonas spp."], 0),
+    (2021, 172, "7.1", "Aeromonas spp.", "all specimens", "groups", ["Aeromonas spp.", "Faeces"], 0),
+    (2022, 187, "8.1", "Aeromonas spp.", "all specimens", "groups", ["Aeromonas spp.", "Faeces"], 0),
+    (2019, 84, "5.8", "Vibrio", "faeces", "groups", ["V. cholerae", "Vibrio spp."], 0),
+    (2021, 175, "7.6", "Vibrio", "faeces", "groups", ["V. cholerae", "Vibrio spp."], 0),
+    (2022, 192, "8.7", "Vibrio", "faeces", "groups", ["V. cholerae", "Vibrio spp."], 0),
 ]
 CELL = re.compile(r"^(\*?)(\d+)/(\d+)(?:\(([\d.]+)%?\)|\(-\))?$")
 
 
-def parse_table(page, layout, groups):
+def parse_table(page, layout, groups, idx=None):
     tabs = page.find_tables().tables
     assert tabs, "no table found"
-    tb = max(tabs, key=lambda t: len(t.extract()))
+    tb = tabs[idx] if idx is not None else max(tabs, key=lambda t: len(t.extract()))
     grid = [[re.sub(r"\s+", " ", c or "").strip() for c in row] for row in tb.extract()]
     is_val = lambda c: bool(re.match(r"^\*?\d+ ?/", c.replace(" ", "")))
     first_data = next(i for i, row in enumerate(grid) if any(is_val(c) for c in row))
@@ -95,12 +103,12 @@ def parse_table(page, layout, groups):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     allrows = []
-    for yr, pg, tno, org, spec, layout, groups in TABLES:
+    for yr, pg, tno, org, spec, layout, groups, *idx in TABLES:
         d = fitz.open(os.path.join(RAW, f"amrsn_{yr}.pdf"))
         page = d[pg - 1]
         cap = re.search(r"Table " + re.escape(tno) + r"\b", page.get_text())
         assert cap, f"Table {tno} caption not on {yr} p{pg}"
-        for r in parse_table(page, layout, groups):
+        for r in parse_table(page, layout, groups, idx[0] if idx else None):
             allrows.append({"report": yr, "page": pg, "table": tno, "organism": org, "specimen": spec, "layout": layout, **r})
     df = pd.DataFrame(allrows)
     df["antimicrobial_raw"] = df.antimicrobial_raw.str.replace(r"\s+", " ", regex=True).str.replace("- ", "-")

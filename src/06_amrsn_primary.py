@@ -4,6 +4,7 @@ Primary value for each organism, antimicrobial and year = the value in that year
   E. coli   - own-year column of the yearly trend table, all specimens except urine and faeces (the specimen category
               with the most isolates among those with reported susceptibility, every year; DEVIATIONS C1)
   S. aureus - the "S. aureus, all specimens" column of the percentage susceptibility table
+  CoNS, Aeromonas spp., Vibrio spp. (non-cholera) - the corresponding column of each year's table (DEVIATIONS C8)
 Checks:
   1. every value stated in the reports' text (docs/amrsn_text_checks.csv) against the extracted table value;
   2. S. aureus: own-year column of the trend table against the all-specimens table (two tables in one report);
@@ -43,7 +44,12 @@ def main():
 
     ec = df[(df.organism == "E. coli") & (df.specimen != "urine") & (df.layout == "trend") & (df.year == df.report)]
     sa = df[(df.organism == "S. aureus") & (df.layout == "groups") & (df.column == "S. aureus")]
-    prim = pd.concat([ec, sa])
+    # further shared organisms (DEVIATIONS C8): CoNS column of the staphylococcal tables; Aeromonas all specimens;
+    # non-cholera Vibrio spp. (faeces)
+    cons = df[(df.organism == "S. aureus") & (df.layout == "groups") & (df.column == "CoNS")].assign(organism="CoNS")
+    aer = df[(df.organism == "Aeromonas spp.") & (df.column == "Aeromonas spp.")]
+    vib = df[(df.organism == "Vibrio") & (df.column == "Vibrio spp.")].assign(organism="Vibrio spp.")
+    prim = pd.concat([ec, sa, cons, aer, vib])
     prim = prim[["organism", "specimen", "antimicrobial", "year", "n_susceptible", "n_tested", "pct_s", "pct_ns",
                  "report", "table", "page", "flag"]].sort_values(["organism", "antimicrobial", "year"])
     assert not prim.duplicated(["organism", "antimicrobial", "year"]).any()

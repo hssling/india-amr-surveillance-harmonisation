@@ -27,10 +27,13 @@ Z = 1.959964
 N_INFAAR = {("Figure 2", "Freshwater fish"): 35, ("Figure 2", "Shrimps"): 193, ("Figure 2", "Marine fish"): 48,
             ("Figure 4", "Freshwater fish"): 1441, ("Figure 4", "Shrimps"): 481, ("Figure 4", "Marine fish"): 157,
             ("Figure 11", "Cattle"): 420, ("Figure 11", "Buffalo"): 125, ("Figure 11", "Goat"): 434,
-            ("Figure 11", "Poultry"): 722, ("Figure 10A", "Food animals"): 452}
+            ("Figure 11", "Poultry"): 722, ("Figure 10A", "Food animals"): 452,
+            ("Figure 3", "Freshwater fish"): 1389, ("Figure 3", "Shrimps"): 444, ("Figure 3", "Marine fish"): 61,
+            ("Figure 6", "Shrimps"): 464, ("Figure 6", "Marine fish"): 102, ("Figure 7", "Aquaculture (all)"): 1657,
+            ("Figure 10D", "Food animals"): 792}
 SECTOR = {"Freshwater fish": "fisheries", "Shrimps": "fisheries", "Marine fish": "fisheries", "Food animals": "livestock",
           "Cattle": "livestock", "Buffalo": "livestock", "Goat": "livestock", "Sheep": "livestock", "Poultry": "livestock",
-          "Pigs": "livestock"}
+          "Pigs": "livestock", "Aquaculture (all)": "fisheries"}
 # (organism, human antimicrobial, animal antimicrobial, comparison, INFAAR figures)
 PAIRS = [
     ("E. coli", "amikacin", "amikacin", "same drug", ["Figure 4", "Figure 11"]),
@@ -48,6 +51,22 @@ PAIRS = [
     ("S. aureus", "co-trimoxazole", "co-trimoxazole", "same drug", ["Figure 2", "Figure 10A"]),
     ("S. aureus", "ciprofloxacin", "ciprofloxacin", "same drug", ["Figure 2"]),
     ("S. aureus", "ciprofloxacin", "enrofloxacin", "fluoroquinolone class", ["Figure 10A"]),
+    # further shared organisms (DEVIATIONS C8). Livestock CoNS = Figure 10D, the panel the report's text describes as
+    # CoNS (its caption says MR-CoNS; see the INFAAR extraction validation).
+    ("CoNS", "cefoxitin", "cefoxitin", "methicillin resistance, phenotypic", ["Figure 3"]),
+    ("CoNS", "penicillin", "penicillin", "same drug", ["Figure 3", "Figure 10D"]),
+    ("CoNS", "erythromycin", "erythromycin", "same drug", ["Figure 3", "Figure 10D"]),
+    ("CoNS", "linezolid", "linezolid", "same drug", ["Figure 3", "Figure 10D"]),
+    ("CoNS", "tetracycline", "tetracycline", "same drug", ["Figure 3", "Figure 10D"]),
+    ("CoNS", "co-trimoxazole", "co-trimoxazole", "same drug", ["Figure 3", "Figure 10D"]),
+    ("CoNS", "ciprofloxacin", "ciprofloxacin", "same drug", ["Figure 3"]),
+    ("CoNS", "ciprofloxacin", "enrofloxacin", "fluoroquinolone class", ["Figure 10D"]),
+    ("Aeromonas spp.", "ciprofloxacin", "ciprofloxacin", "same drug", ["Figure 7"]),
+    ("Aeromonas spp.", "imipenem", "imipenem", "same drug", ["Figure 7"]),
+    ("Aeromonas spp.", "tetracycline", "tetracycline", "same drug", ["Figure 7"]),
+    ("Vibrio spp.", "ampicillin", "ampicillin", "same drug (human n small)", ["Figure 6"]),
+    ("Vibrio spp.", "tetracycline", "tetracycline", "same drug (human n small)", ["Figure 6"]),
+    ("Vibrio spp.", "co-trimoxazole", "co-trimoxazole", "same drug (human n small)", ["Figure 6"]),
 ]
 
 
@@ -97,7 +116,7 @@ def main():
     v = pd.read_csv(os.path.join(OUT, "infaar_values.csv")).fillna({"flag": ""})
     out = []
     for org, hdrug, adrug, comp, figs in PAIRS:
-        for spec in (["urine"] if "urine" in comp else (["all specimens except urine and faeces", "urine"] if org == "E. coli" else ["all specimens"])):
+        for spec in (["urine"] if "urine" in comp else sorted(s[s.organism == org].specimen.unique())):
             h = s[(s.organism == org) & (s.antimicrobial == hdrug) & (s.specimen == spec)]
             if h.empty:
                 continue
@@ -108,8 +127,7 @@ def main():
                    "human_pct_ns": round(100 * k / n, 1), "human_ci": f"{lo}-{hi}", "human_n": n,
                    "human_by_year": "; ".join(f"{int(r.year)}: {r.pct_ns:.1f}" for _, r in h.sort_values("year").iterrows()),
                    "human_flag": "; ".join(sorted(set(f for f in h.flag if f)))}
-            a = v[v.figure.isin(figs) & (v.organism.isin(["E. coli", "S. aureus"])) & (v.antimicrobial == adrug)]
-            a = a[a.organism == org]
+            a = v[v.figure.isin(figs) & (v.antimicrobial == adrug)]       # each figure shows one organism
             for _, r in a.iterrows():
                 na = N_INFAAR.get((r.figure, r.source))
                 alo, ahi = wilson(round(r.value_pct * na / 100), na) if na else (np.nan, np.nan)
@@ -129,12 +147,23 @@ def main():
                 "animal_source": "Food animals", "sector": "livestock", "infaar_figure": "text p24 (41/452)",
                 "animal_pct_r": round(100 * 41 / 452, 1), "animal_ci_approx": f"{alo}-{ahi}", "animal_n_isolates": 452,
                 "difference_pp": round(100 * k / n - 100 * 41 / 452, 1), "animal_flag": "genotypic definition"})
+    h = s[(s.organism == "CoNS") & (s.antimicrobial == "cefoxitin")]
+    k, n = int(h.n_ns.sum()), int(h.n_tested.sum())
+    lo, hi = wilson(k, n)
+    alo, ahi = wilson(53, 792)
+    out.append({"organism": "CoNS", "human_drug": "cefoxitin", "animal_drug": "mecA/mecC", "comparison":
+                "methicillin resistance: human phenotypic (cefoxitin) vs animal genotypic (mecA/mecC)",
+                "human_specimen": "all specimens", "human_years": "2019-2022", "human_pct_ns": round(100 * k / n, 1),
+                "human_ci": f"{lo}-{hi}", "human_n": n, "human_by_year": "", "human_flag": "",
+                "animal_source": "Food animals", "sector": "livestock", "infaar_figure": "text p25 (53/792)",
+                "animal_pct_r": round(100 * 53 / 792, 1), "animal_ci_approx": f"{alo}-{ahi}", "animal_n_isolates": 792,
+                "difference_pp": round(100 * k / n - 100 * 53 / 792, 1), "animal_flag": "genotypic definition"})
     c = pd.DataFrame(out)
     c.to_csv(os.path.join(OUT, "concordance.csv"), index=False)
 
     # rank order of shared same-drug antimicrobials, primary human series vs each animal source
     ranks = []
-    for org in ("E. coli", "S. aureus"):
+    for org in ("E. coli", "S. aureus", "CoNS"):
         prim = c[(c.organism == org) & (c.comparison == "same drug") & (c.human_specimen != "urine")]
         for src, g in prim.groupby("animal_source"):
             if len(g) >= 4:
