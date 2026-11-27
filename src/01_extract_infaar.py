@@ -2,9 +2,9 @@
 
 For each page: every y-axis is found as a vertical column of numeric tick labels; the value scale is fitted by least
 squares to all its ticks. Each filled bar is assigned to the nearest axis to its left whose range contains the bar's
-base, its value is read from the scale, its category is the label word nearest its centre below the axis, and its
-series (for grouped charts) is the legend entry drawn in the same colour. Panel titles are the nearest text above the
-axis. Raster charts are listed for digitising separately.
+base, and its value is read from the scale. The bar's fill colour is kept; figure, source and antimicrobial are
+assigned in 02_label_infaar.py (the category and series columns here are provisional). Pages with raster images are
+listed in infaar_pages.csv.
 
 Usage:  python -I src/01_extract_infaar.py            writes outputs/infaar_extracted.csv and outputs/infaar_pages.csv
 """
@@ -113,7 +113,9 @@ def main():
             title = " ".join(w[4] for w in sorted(above, key=lambda w: (round(w[1]), w[0])))
             rows.append({"page": pno + 1, "axis_x": round(a["x1"], 1), "panel_title": title[:120],
                          "series": legend.get(tuple(round(c, 3) for c in fill), ""), "category": label,
-                         "value_pct": round(value, 1), "bar_x": round(cx, 1), "bar_top": round(r.y0, 2), "axis_ticks": a["ticks"],
+                         "value_pct": round(value, 1), "bar_x": round(cx, 1), "bar_w": round(r.width, 2), "bar_top": round(r.y0, 2),
+                         "axis_y0": round(a["y_zero"], 1), "axis_ticks": a["ticks"],
+                         "fill": "#" + "".join(f"{round(255 * c):02x}" for c in fill[:3]),
                          "flag": a.get("flag", "")})
     os.makedirs(OUT, exist_ok=True)
     df = pd.DataFrame(rows).sort_values(["page", "axis_x", "bar_x"])
