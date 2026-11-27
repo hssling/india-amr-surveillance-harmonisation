@@ -20,3 +20,4 @@ __pycache__/
 
 # Results stay local until the release that accompanies submission.
 outputs/*.csv
+outputs/figures/

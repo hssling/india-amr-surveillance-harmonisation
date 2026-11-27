@@ -71,3 +71,37 @@ captions and text disagree; see the extraction validation), Aeromonas species (A
 Aeromonas tables; INFAAR: Figure 7) and Vibrio species other than V. cholerae (AMRSN: "Vibrio spp." column,
 flagged for small numbers; INFAAR: Figure 6). V. cholerae (AMRSN) and V. parahaemolyticus (INFAAR) are different
 species and are not paired.
+
+## D. Exploratory analyses added 28 November 2026 (not in the frozen plan; reported as exploratory)
+
+D1. **Minimum common panel (Aim 3), rule fixed before derivation.** For each organism shared by both networks, every
+antimicrobial class tested by either network should be tested by both, with one representative drug per class
+(the drug already tested by the most units; ties broken by the EU harmonised panel), one interpretive standard and
+reporting of counts with MIC or zone distributions. The derived panel is compared with the EU harmonised monitoring
+panel (Commission Implementing Decision (EU) 2020/1729) as an external benchmark, for E. coli.
+
+D2. **Measurement DAG.** A directed acyclic graph of how true resistance in each reservoir becomes the reported
+percentage (sampling frame, isolate selection, test method, interpretive standard, handling of intermediate
+results, reporting), with each measurement node marked by its Part A rating, and common causes of resistance in both
+reservoirs. Used to state formally which differences the data can and cannot support.
+
+D3. **Panel network and silo index.** A bipartite network of surveillance units (network x sector or specimen x
+organism) and the antimicrobials they test, projected onto units with Jaccard weights. Weighted modularity of the
+partition by network is compared with the partition by organism, with a label-permutation test (10,000
+permutations, seed 2026), and within-organism panel similarity is compared within and across networks.
+
+D4. **Resistance-profile network.** For E. coli (amikacin, cefotaxime, imipenem, fluoroquinolone class) and for
+staphylococci (penicillin, erythromycin, linezolid, tetracycline, co-trimoxazole), sources are linked by the
+Euclidean distance between their resistance profiles; a minimum spanning tree and average-linkage clustering are
+reported, with stability from 2,000 parametric bootstrap replicates (binomial resampling at each source's count;
+sources without a reported count use the smallest reported livestock count, 125, and are flagged).
+
+D5. **Method-effect yardstick and difference intervals.** Newcombe hybrid-score 95% intervals for each human-animal
+difference where both counts are available; and the largest measurement effect documented inside either network
+(e.g. the same isolates classified by two MRSA methods, or two third-generation cephalosporins) as a lower bound on
+measurement uncertainty against which human-animal differences are read.
+
+D1 addendum (after derivation, 28 November 2026). The union rule gives 16 classes for E. coli, including agents used
+only for urinary infection in humans. The E. coli panel is therefore reported in two tiers: core (classes also on the
+EU harmonised panel) and extended (the rest). Non-cholera Vibrio is excluded because AMRSN has no routine panel for it.
+This tiering was chosen after seeing the derived panel.
