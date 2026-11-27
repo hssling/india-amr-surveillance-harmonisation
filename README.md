@@ -2,8 +2,9 @@
 
 Code and derived outputs for a study by Siddalingaiah H S.
 
-**Status:** in preparation. The analysis plan is released here before any outcome is analysed; that
-release carries a Zenodo DOI and serves as the pre-registration. Code and outputs follow in later releases.
+**Status:** analysis plan frozen on 28 November 2026 (`docs/ANALYSIS_PLAN.md`) before any human-animal comparison, released as v0.1.0 with a Zenodo DOI. Code and outputs follow in later releases.
+
+**Archived:** analysis plan v0.1.0, doi:[10.5281/zenodo.24601808](https://doi.org/10.5281/zenodo.24601808) (concept DOI: [10.5281/zenodo.24601806](https://doi.org/10.5281/zenodo.24601806)).
 
 ## Data
 
